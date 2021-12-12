@@ -1,0 +1,719 @@
+---
+title: ""
+output: html_document
+---
+<div style="font-size:26pt; font-weight:bold">
+Truenumbers:&nbsp;&nbsp; tnum R package</div>
+
+<div  style="font-size:24pt">
+Instructions and examples: v3</div>
+
+<div style="font-size:14pt">MA615: &nbsp;&nbsp; 2021 Dec 3</div>
+
+<br><br>
+
+
+
+```{r setup, echo=FALSE, warning=FALSE, message=FALSE}
+
+library(knitr)
+library(kableExtra)
+library(magrittr)
+library(gutenbergr)
+
+library(tidyverse)
+library(tnum)
+
+```
+
+Truenumbers (TN) is a system for building data resources that are hosted on a server and accessed through clients that interact with with server through the Truenumbers API. The system uses natural language descriptions of data items and includes a tagging function for augmenting data items, defining subsets, and tracking process metadata. 
+
+
+Each datum in a TN repository is described by a simple declarative sentence consisting of a subject, a property, a value, and (optionally) tags:   
+    <center><strong>\<subject\> has \<property\> = \<value\>.</strong></center><br>
+    
+Subjects and properties are described with "phrase-paths" that capture natural language descriptions of data in a format that is both machine and human readable.  For example, the statement "In 2019, the population of Suffolk County in Massachusetts was 803,907." can be encoded as the truenumber  <br><br>
+<div style="margin-left:50px">
+<strong>Subject</strong> = Massachusetts/County:Suffolk   
+<strong>Property</strong> = Population:2019  
+<strong>Value</strong> = 803907 people  
+
+ 
+Where <strong>"/"</strong> denotes possession and is read "has"   
+and <strong>":"</strong> denotes an adjective   
+</div><br>
+
+
+
+If you are collecting data about multiple Massachusetts counties and need to distinguish between counties in Eastern, Central, and Western parts of the state, you could tag Suffolk County as @Eastern_MA.  Tags are flexible. Tagging may add numeric, factor, or process data to a TN.  You might also add tags to Suffolk county to record that 80% of Suffolk county voters vote Democratic, or that you last modified this TN on 2021NOV28,  Tags can track the stages of your data exploration and analysis. 
+
+As your analysis continues to modeling and parameter estimation, you can 
+create new TNs to record paramter estimates with point estimates and standard error. TNs can include notes, links to images, videos, or code.  TNs give you flexibility needed during data exploration without giving up the structure and control required for reproducible analysis and modeling.
+
+
+
+With the tnum R package, the TN system becomes a data management companion for R.  With a TN server and the tnum R package, R users can use TN from the first day of a project, 
+
+<p style="page-break-before:always; padding-top:25px">
+
+## Truenumbers at BU 
+
+TN servers are installed by True Engineering Technology and are compatible with a wide variety of platforms. To support our work at MSSP, TN server has been installed on mssp1.bu.edu. 
+
+To use Truenumbers on the mssp1.bu.edu server, you must access it from the BU Charles River Campus or connect to the BU network via VPN.  Instructions for how to download, install, and run a vpn client to connect to the BU network are available at   <a href="https://www.bu.edu/tech/services/cccs/remote/vpn/use/">bu.edu/tech/services/cccs/remote/vpn</a>.
+
+
+<br><br>
+
+<!-- <p style="page-break-before:always; padding-top:25px"> -->
+
+
+## Installing the R tnum package  
+
+To use the TN server with R, install the R tnum package. 
+Make sure that you have the devtools package andinstall tnum from github as follows:
+
+      devtools::install_github("Truenumbers/tnum/tnum")
+      
+Documentation for tnum is available from the R help system.  Use help(package = "tnum").
+
+<p style="page-break-before:always; padding-top:25px">
+
+## Function List for the tnum package
+
+The package is comprised of 24 functions all of which are pre-fixed by "tnum."
+
+
+
+<style type="text/css">
+.tg  {border-collapse:collapse;border-spacing:0;}
+.tg td{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:12px;
+  overflow:hidden;padding:5px 5px;word-break:normal;}
+.tg th{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:12px;
+  font-weight:normal;overflow:hidden;padding:5px 5px;word-break:normal;}
+.tg .tg-pe1m{font-size:14px;font-weight:bold;text-align:left;vertical-align:top}
+.tg .tg-za14{border-color:inherit;text-align:left;vertical-align:bottom}
+.tg .tg-0pky{border-color:inherit;text-align:left;vertical-align:top}
+</style>
+<table class="tg">
+<thead>
+  <tr>
+  <th class="tg-pe1m", colspan="2">Documentation for package ‘tnum’ version 0.3.3</th>
+  </tr>
+  <tr>
+    <th class="tg-pe1m">tnum function</th>
+    <th class="tg-pe1m">description</th>
+  </tr>
+</thead>
+<tbody>
+  <tr>
+    <td class="tg-za14">tnum.authorize</td>
+    <td class="tg-za14">Connect&nbsp;&nbsp;&nbsp;and authenticate to Truenumbers server</td>
+  </tr>
+  <tr>
+    <td class="tg-za14">tnum.createSpace</td>
+    <td class="tg-za14">Create new numberspace</td>
+  </tr>
+  <tr>
+    <td class="tg-za14">tnum.decodeNumericVectorString</td>
+    <td class="tg-za14">Return numeric vector from&nbsp;&nbsp;&nbsp;string "vector(1.23,34.5....)"</td>
+  </tr>
+  <tr>
+    <td class="tg-za14">tnum.deleteByQuery</td>
+    <td class="tg-za14">Delete tnums specified by a&nbsp;&nbsp;&nbsp;query</td>
+  </tr>
+  <tr>
+    <td class="tg-za14">tnum.getAttrFromList</td>
+    <td class="tg-za14">Title</td>
+  </tr>
+  <tr>
+    <td class="tg-za14">tnum.getDatabasePhraseList</td>
+    <td class="tg-za14">Get phrase taxonomies</td>
+  </tr>
+  <tr>
+    <td class="tg-za14">tnum.getDBPathList</td>
+    <td class="tg-za14">Get phrase taxonomies</td>
+  </tr>
+  <tr>
+    <td class="tg-za14">tnum.getSpace</td>
+    <td class="tg-za14">Get current numberspace name</td>
+  </tr>
+  <tr>
+    <td class="tg-za14">tnum.graphPathList</td>
+    <td class="tg-za14">Make and render a graph from a&nbsp;&nbsp;&nbsp;list of phrase paths</td>
+  </tr>
+  <tr>
+    <td class="tg-za14">tnum.graphTnumList</td>
+    <td class="tg-za14">Make full tnum graph from&nbsp;&nbsp;&nbsp;tnum.query return data frame</td>
+  </tr>
+  <tr>
+    <td class="tg-za14">tnum.makeNumericVectorString</td>
+    <td class="tg-za14">Create a tnum vector value&nbsp;&nbsp;&nbsp;string "vector(23,-34.02...)" from an R vector or list</td>
+  </tr>
+  <tr>
+    <td class="tg-za14">tnum.makeObject</td>
+    <td class="tg-za14">make a&nbsp;&nbsp;&nbsp;tnum object from numeric values in a tnum data frame</td>
+  </tr>
+  <tr>
+    <td class="tg-za14">tnum.makePhraseGraphFromPathList</td>
+    <td class="tg-za14">Get a DiagrammeR tree for&nbsp;&nbsp;&nbsp;rendering, from a list of SRD paths</td>
+  </tr>
+  <tr>
+    <td class="tg-za14">tnum.makeTnumJson</td>
+    <td class="tg-za14">Create a JSON truenumber from&nbsp;&nbsp;&nbsp;parts</td>
+  </tr>
+  <tr>
+    <td class="tg-za14">tnum.makeTnumPhraseGraph</td>
+    <td class="tg-za14">Make full tnum graph from&nbsp;&nbsp;&nbsp;tnum.query return data frame</td>
+  </tr>
+  <tr>
+    <td class="tg-za14">tnum.objectsToDf</td>
+    <td class="tg-za14">make data frame from list of&nbsp;&nbsp;&nbsp;tnum objects</td>
+  </tr>
+  <tr>
+    <td class="tg-za14">tnum.plotGraph</td>
+    <td class="tg-za14">Plot DiagrammeR graph</td>
+  </tr>
+  <tr>
+    <td class="tg-za14">tnum.postFromLists</td>
+    <td class="tg-za14">Create many truenumbers from&nbsp;&nbsp;&nbsp;lists of parts</td>
+  </tr>
+  <tr>
+    <td class="tg-za14">tnum.postObjects</td>
+    <td class="tg-za14">post a list or vector of tnum&nbsp;&nbsp;&nbsp;objects</td>
+  </tr>
+  <tr>
+    <td class="tg-za14">tnum.query</td>
+    <td class="tg-za14">Query the truenumber DB</td>
+  </tr>
+  <tr>
+    <td class="tg-za14">tnum.queryResultToObjects</td>
+    <td class="tg-za14">Convert tnum query result to&nbsp;&nbsp;&nbsp;an object list</td>
+  </tr>
+  <tr>
+    <td class="tg-za14">tnum.setSpace</td>
+    <td class="tg-za14">Set a particular numberspace&nbsp;&nbsp;&nbsp;as current</td>
+  </tr>
+  <tr>
+    <td class="tg-za14">tnum.tagByGuids</td>
+    <td class="tg-za14">Add a column of single tags&nbsp;&nbsp;&nbsp;element-wise to list of tnums by GUID</td>
+  </tr>
+  <tr>
+    <td class="tg-za14">tnum.tagByQuery</td>
+    <td class="tg-za14">Tag tnums specified by a query</td>
+  </tr>
+</tbody>
+</table>
+
+
+<br><br>
+<p style="page-break-before:always; padding-top:25px">
+      
+## Using tnum for the first time      
+      
+When you run tnum for the first time, take three steps --
+<br>
+<ol>
+
+<li>Make sure you can connect to the mssp1.bu.edu server by opening a command window (or terminal window) and entering the command:
+
+<div style="margin-left:50px"
+\>ping mssp1.bu.edu
+
+If the server is accessible from your computer, you see something like this:
+<br>
+
+```{r server_test, echo=FALSE, results='asis'}
+
+cat(system("ping mssp1.bu.edu", intern = TRUE), sep="<br>") %>%  kable()
+
+```
+
+</div>
+<br>
+
+
+</li>
+
+<li> Load the tnum package and authorize the mssp1 server.  
+Note that the server responds with a list of available number spaces and by default sets the number space to "testspace."
+
+```{r echo=TRUE}
+
+tnum.authorize("mssp1.bu.edu")
+
+```
+
+
+</li>
+<br>
+
+<li> Explore a number spaces
+
+Use the tnum.getDBPathList() function with the "taxonomy" parameter set to "subject" for a list of the subject phrase-paths.  
+The levels parameter determines how mucy of the subject phrase-path tree is reported. At level=1, you only see the root. 
+
+
+```{r eval=FALSE}
+
+tnum.getDBPathList(taxonomy = "subject", levels=1)
+
+```
+
+<p style="page-break-before:always; padding-top:25px">
+
+To see the TNs for subject phrase-paths use tnum.query().
+
+Wildcards let you see the entire branches of the tree. The # wildcard is used for phrase-paths.  The * wildcard is used for strings.  The max parameter limits the number of TNs are returned. Max=10 by default. 
+
+Assign the return from tnum.query to a variable 
+so that you can examine the list items in the environment.  Even better, convert the TN list to a data frame (use the tnum.objectstoDF() function) so that each TN is a row in the dataframe.
+
+```{r austen_example, echo=TRUE, warning=FALSE, message=FALSE}
+
+ q111 <- tnum.query(query = "austen# has ordinal", max=500)   ## everything
+ df111 <- tnum.objectsToDf(q111)
+
+## show ordered objects in document
+q112 <- tnum.query("austen# has ordinal")   ## show ordered objects in document
+df112 <- tnum.objectsToDf(q112)
+
+## focus on one paragraph -- note the word count for each sentence
+q3 <- tnum.query("austen/persuasion/chapter-1/paragraph-7# has count#")  # just 1 para
+df3 <- tnum.objectsToDf(q3)
+df3
+
+
+## and now look at the text in a sentence
+q1 <- tnum.query("austen/persuasion/chapter-1/paragraph-7/sentence-3# has text")
+df1 <- tnum.objectsToDf(q1)
+df1
+
+## To extract a paragraph of text
+q4 <- tnum.query("austen/persuasion/chapter-1/paragraph-7/sentence# has text", max = 15)
+df4 <- tnum.objectsToDf(q4)
+para_text4 <- df4 %>% pull(string.value) %>% 
+                      str_replace_all("\"","") %>% 
+                      str_flatten(collapse = " ")
+
+
+
+
+## steps to understand
+# a <- para_text4[4]
+# a
+# 
+# b <- str_replace_all(a,"\"","")
+# b
+# 
+# c <- para_text4
+# c
+# 
+# c <- str_replace_all(c,"\"","")
+
+
+
+```
+
+<br>
+<li>Now switch to another number space, say alion-rf, and explore on your own.
+
+</li>
+</ol>
+
+<p style="page-break-before:always; padding-top:25px">
+
+## Example of tnum used in text analysis
+
+Now, let's use TNs for text analysis.  
+
+Start by loading the libraries you will need, authorizing the server if needed, and setting the number space to "test2"
+
+```{r setup_test2, echo=TRUE, warning=FALSE, message=FALSE}
+  
+
+
+tnum.setSpace("test2")
+
+```
+
+In this example, we will work with *The Time Machine" by H.G. Wells. 
+
+To get started, download the book from the Gutenberg project using the R Gutenbergr package. 
+
+[NB: As it turns out, using the Gutenbergr package is an unfortunate choice.  In the <a href= "https://www.gutenberg.org/">Gutenberg Project</a> books can be downloaded in a variety of formats.  The Gutenbergr package downloads the Plain Text option.  For our purposes the HTML option would have made things much easier.  Not knowing this, we have spent time developint code to break the text into chapters, paragraphs and sentences. The html version of the book has chapters and paragraphs clearly tagged.  
+
+To complete the work as we did it, I am going to explain what we did and leave html to truenumbers for another day.]
+
+
+After the book has been downloaded, it is written out as a text file so that headings can be marked up by hand.  This is not much work and removes the possibility of mis-identified headers that has been a problem when trying to work with the plain text verstion of the book.  
+Each heading is inclosed in tag-brakets ("<"dnd ">"), marking the beginning and end of the head. The ingestion code has been modified for this bit of manual intervention.
+
+
+```{r guten_down, warning=FALSE, message=FALSE, eval=FALSE}
+
+time_machine22 <- gutenberg_download(gutenberg_id = 35)  ## download The Time Machine
+
+```
+
+
+Once the manual markup has been applied to the text file, you can ingest it with Allen Razdow's Book-to-TN function which is available in the source file Book2TN-v6A-1.R.
+
+Source the R file, and ingest the book using the function call
+
+<div style="margin-left:50px">
+
+**tnBooksFromLines(text, root) **
+
+where **text** is the book text and **root** is the root of the TN tree in which the ingested book text will be stored.
+</div>
+
+Note that the ingestion process ingests 51 TNs at a time.  A long book will take a few minutes to process.  During the process, you will see two lines posted on your console every few seconds 
+
+<div style="margin-left:50p; color:red">
+posted 51 tnums <br>
+nnnn characters
+</div>
+<div style="color:black">
+where nnnn is the accumulating numbers of characters that have been ingested.
+<div>
+
+<br>
+
+
+```{r ingest, eval=FALSE}
+time_mach_txt <- readLines("tm10m.txt")
+
+source("Book2TN-v6A-1.R")
+
+
+## ingest time_mach_text into a fresh TN name
+
+tnBooksFromLines(time_mach_txt, "wells12/hw12")  ###  new version v6A-1
+
+
+```
+
+
+<br>
+Now, make sure your book has been ingested properly.
+<br>
+
+```{r eval=FALSE}
+ tnum.getDBPathList(taxonomy="subject", levels=2)
+
+```
+
+<br> 
+
+You should see your book in the numberspace.
+
+<br>
+
+Now, let's explore the TNs that contain The Time Machine text.
+
+
+
+```{r hgwells1}
+
+## use query to check TNs
+
+###  w    queries
+###  wdf  dataframe
+###
+###  starting with 10 -- in 3s
+###
+
+##  The ordinal numbers for the entire book 
+##  show the sequence of objects in order of their appearance.
+w10 <- tnum.query("wells12/hw12# has ordinal", max=1800)
+wdf10 <- tnum.objectsToDf((w10))
+
+
+## Examing the first 50 TNs  makes it easy to see the Table of Contents
+## and to see that object 22 is the heading at the start of Chapter 1
+
+
+## This shows the Table of Contents
+w11 <- tnum.query("wells12/hw12# has ordinal", start = 3 ,max=37)
+wdf11 <- tnum.objectsToDf(w11)
+
+
+table_of_contents <- wdf11 %>% select(string.value) 
+
+w12 <- tnum.query("wells12/hw12# has text", start = 3 ,max=18)
+wdf12 <- tnum.objectsToDf((w11))
+
+## Look at just the headings shows the structure of the book
+w13 <- tnum.query("wells12/hw12/heading# has text", max=40)
+wdf13 <- tnum.objectsToDf(w13)
+
+
+## It may look like the table of contents is repeated twice,
+## but examing the ordinals produces chapter list that includes the 
+## ordinal location for the heading of each chapter
+w14 <- tnum.query("wells12/hw12/heading# has ordinal", max=40)
+wdf14 <- tnum.objectsToDf(w14)
+
+chapter_locations <- left_join(select(wdf13, subject, string.value), 
+                               select(wdf14, subject, numeric.value)) %>% 
+                     slice(22:38)
+## add column for chapter number
+chapter_locations %<>% mutate(chapter=1:17)
+
+w15 <- tnum.query("wells12/hw12/section:0022# has ordinal")
+wdf15 <- tnum.objectsToDf(w15)
+
+
+
+a <- chapter_locations %>% filter(chapter==2) %>% 
+                           select(numeric.value) %>% 
+                           unlist()
+
+a <- str_pad(as.character(a),4,side="left",pad="0")
+
+b <- paste0("wells12/hw12/section:",a,"#", " has ordinal")
+
+b
+
+w16 <- tnum.query("wells12/hw12/section:0022# has ordinal")
+
+
+
+## chapter 1 para 1, word counts for the 3 sentences in para 1
+q20 <- tnum.query("wells12/hw12# has *", max=3)
+df20 <- tnum.objectsToDf(q20)
+
+
+
+#  chapter locations  ordinal numbers
+ord_ch1 <- unlist(tnum.query("wells12/hw12/heading:0022# has ordinal"))
+ord_ch2 <- unlist(tnum.query("wells12/hw12/heading:0023# has ordinal"))
+
+
+ch1_txt <- tnum.query("wells12/hw12/section:0022/paragraph:0002/# has text", max=30)
+
+ch1_txt_df <- tnum.objectsToDf(ch1_txt)
+ch1_txt_df$string.value
+
+
+
+ch2_txt <- tnum.query("wells12/hw12/section:0022/paragraph:0002/sentence:# has *", max=30)
+ch2_txt_df <- tnum.objectsToDf(ch2_txt)
+
+ch2_txt_df$string.value
+
+length(ch2_txt_df$string.value)
+
+
+q21 <- tnum.query("wells12/hw12/section:0022/paragraph:0001/# has *", max = 30)
+df21 <- tnum.objectsToDf(q21)
+
+w20 <- tnum.query()
+
+
+######
+## character tagging
+
+qr1 <- tnum.query("wells12/hw12/section:# has * = REGEXP(\" Richardson\")")
+qr_df_1 <- tnum.objectsToDf(qr1)
+
+tnum.tagByQuery("wells12/hw12/section:# has * = REGEXP(\" Richardson\")", adds=("Richardson"))
+
+ # now the query for the tag gives you the same references
+
+ qr2 <- tnum.query("wells12/hw12/section:0037/# has ordinal")
+ qd_df_2 <- tnum.objectsToDf(qr2)
+
+ 
+
+
+```
+## tag characters
+
+```{r character_tags}
+
+
+## Time Traveller
+## Weena
+## Morlock
+## Eloi
+
+## From chapter IV through Chap XV, the time traveller is telling his story
+## in the first person.  Tagging " I " throughout the book and and handling the 
+## restriction to chatpters 4 through 15 after conversion to df sounds like
+## the easiest way to go.
+
+q30 <- tnum.query("wells12/hw12/section:# has * = REGEXP(\" Time Traveller\")", max = 100)
+qdf30 <- tnum.objectsToDf(q30)
+tnum.tagByQuery("wells12/hw12/section:# has * = REGEXP(\" Time Traveller\")", adds=("Time_Traveller"))
+
+
+q31 <- tnum.query("wells12/hw12/section:# has * = REGEXP(\" I \")", max=700)
+qdf31 <- tnum.objectsToDf(q31)
+tnum.tagByQuery("wells12/hw12/section:# has * = REGEXP(\" I \")", adds=("I"))
+
+
+q32 <- tnum.query("wells12/hw12/section:# has * = REGEXP(\" Weena\")", max=50)
+qdf32 <- tnum.objectsToDf(q32)
+tnum.tagByQuery("wells12/hw12/section:# has * = REGEXP(\" Weena\")", adds=("Weena"))
+
+
+q33 <- tnum.query("wells12/hw12/section:# has * = REGEXP(\" Eloi\")", max=15)
+qdf33 <- tnum.objectsToDf(q33)
+tnum.tagByQuery("wells12/hw12/section:# has * = REGEXP(\" Eloi\")", adds=("Eloi"))
+
+q34 <- tnum.query("wells12/hw12/section:# has * = REGEXP(\" Morlock\")", max=70)
+qdf34 <- tnum.objectsToDf(q34)
+tnum.tagByQuery("wells12/hw12/section:# has * = REGEXP(\" Morlock\")", adds=("Morlock"))
+
+
+
+ 
+
+```
+
+
+
+
+
+
+## Analysis -- sentences and paragraphs
+
+
+```{r para_forms}
+
+
+
+pq1 <- tnum.query("wells12/hw12/section:* has ordinal", max = 1800)
+pqdf1 <- tnum.objectsToDf(pq1)
+
+## Convert pqdf1 into a dataframe to reformat it for para-level analysis
+## start with ordinals -- the gaps in the orginal numbering show where the headings go
+
+
+bk_df <- pqdf1 %>% separate(col=subject, sep="/para", into = c("section", "para")) 
+
+bk_df %<>% separate(col=section, sep=":", into= c("out","section"))
+
+bk_df %<>% separate(col=para, sep="/", into=c("pars", "sent"))
+
+bk_df %<>% separate(col=pars, sep=":", into=c("out1", "para"))
+
+bk_df %<>% separate(col=sent, sep=":", into=c("out2", "sent"))
+
+bk_df %<>% rename(ordinal=numeric.value)
+
+bk_df %<>% select(section, para, sent, ordinal)
+
+## Now the word counts
+
+pq2 <- tnum.query("wells12/hw12/section:* has count:#", max = 1800)
+pqdf2 <- tnum.objectsToDf(pq2)
+
+bk_w_df <- pqdf2 %>% separate(col=subject, sep="e:", into=c("out", "sent1"))
+
+bk_w_df %<>% rename(word_count = numeric.value)
+
+bk_w_df %<>% select(sent1, word_count)
+
+bk_df <- cbind2(bk_df, bk_w_df)
+
+## check for anomalies
+a <- filter(bk_df_1, sent==sent1)
+
+bk_df %<>% select(section, para, sent, ordinal, word_count) 
+
+## now add the text
+
+pq3 <- tnum.query("wells12/hw12/section:* has text", max = 1800)
+pqdf3 <- tnum.objectsToDf(pq3)
+
+bk_t_df <- pqdf3 %>% separate(col=subject, sep="e:", into=c("out", "sent1"))
+
+bk_t_df %<>% rename(s_text = string.value)
+
+bk_t_df %<>% select(s_text)
+  
+bk_df <- cbind2(bk_df, bk_t_df)
+
+
+pq4 <- tnum.query("wells12/hw12/section:* has text", max = 1800)
+pqdf4 <- tnum.objectsToDf(pq4)
+
+bk_tag_df <- pqdf4 %>% select(tags)
+
+
+## form paragraphs
+
+
+  
+  
+
+
+```
+
+
+
+
+
+## now sentimentr
+
+```{r sentr1}
+
+library(sentimentr)
+
+jane_1 <- get_sentences(para_text4)
+
+## to get sentiment scores by sentence
+sentiment(jane_1)
+
+## to get sentiment scores aggregated by paragraph
+sentiment_by(jane_1)
+
+
+
+```
+
+```{r}
+
+
+#tnum.query("wells12/hw12/section:0022/paragraph:0002/sentence:# has *")
+
+q31 <- tnum.query("wells12/hw12/section:# has ordinal", max=500)
+qdf31 <- tnum.objectsToDf(q31)
+
+
+q30 <- tnum.query("wells12/hw12/section:0022# has * = REGEXP(\" Filby\")")
+
+qdf30 <- tnum.objectsToDf(q30)
+
+tnum.tagByQuery("wells12/hw12/section:0022# has * = REGEXP(\" Filby\")", adds=("reference:Filby"))
+
+
+ # now the query for the tag gives you the same references
+
+ q31 <- tnum.query("@reference:Filby")
+ qdf31 <- tnum.objectsToDf(q31)
+
+ # graph4 <- tnum.makeTnumPhraseGraph(query2)
+
+```
+
+
+
+
+
+query3 <- tnum.query("*pride* has * = REGEXP(\"street\")", max = 200)
+
+tnum.tagByQuery("*pride* has * = REGEXP(\"street\")", adds=("ref:street"))
+query4 <- tnum.query("@ref:street")
+
+df2 <- tnum.objectsToDf(query4)
+
+
+ bug graph2 <- tnum.makeTnumPhraseGraph(query4, "string.value")
+
+
+tnum.plotGraph(graph2)
+

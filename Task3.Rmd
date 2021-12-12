@@ -1,0 +1,77 @@
+---
+title: "Heart of Darkness - Sentiment Analysis (Task 2)"
+author: "Zara Waheed"
+output: pdf_document
+---
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+require(gridExtra)
+
+source("sentiment_analysis.R", echo = FALSE)
+```
+
+## Introduction
+
+This report is a sentiment analysis using TrueNumbers of the novel Heart of Darkness by Joseph Conrad. Different lexicons are used to see the overall sentiment of the book.
+
+## Initial steps
+
+Similar to Task 2, I did some cleaning of the text file of the book in order to make easier to work with. After downloading the book, I manually removed the table of contents. I also marked all the chapters so they were easier for TrueNumbers to read.
+
+I then authorized the mssp server to get access. I set the test space to test3 and read lines from my book. I then used the Book2Tn file to ingest my book into TrueNumbers. After a couple of tries I got it to work. I then checked to see if it had been uploaded correctly and began to run queries on it.
+
+To align with my initial analysis, three different lexicons were used in this analysis namely, "Afinn", "Bing", and "Nrc". 
+
+## Data cleaning
+
+The data cleaning was more of a challenge in this task. Creating data frames that contained sections for each chapter, paragraph and sentence required some extraction. In the end I ended up with a data frame that had the relevant divisions as shown below.
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.align='center',}
+
+head(tidy_hod_tnum)
+
+```
+
+I explored the same three lexicons as Task 2. The analysis is done at sentence and paragraph level.
+
+## Sentence level Sentiment Analysis
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.height=5, fig.width = 6, fig.align='center',}
+
+ggplot(tnum_alllex2, aes(sentence, sentiment, fill = method)) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~ method, ncol = 1, scales = "free_x")
+
+```
+
+
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.height=4, fig.width = 5, fig.align='center',}
+
+grid.arrange(afinn_sentence_neg, afinn_sentence_pos, nrow=2)
+
+```
+
+
+
+## Paragraph level Sentiment Analysis
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.height=5, fig.width = 6, fig.align='center',}
+
+ggplot(tnum_alllex, aes(numpara, sentiment, fill = method)) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~ method, ncol = 1, scales = "free_x")
+
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.height=4, fig.width = 5, fig.align='center',}
+
+grid.arrange(afinn_para_neg, afinn_para_pos, nrow=2)
+
+```
+
